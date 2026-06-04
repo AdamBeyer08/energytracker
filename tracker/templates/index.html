@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnergyTracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f9; color: #333; }
+        nav { background-color: #2c3e50; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        nav a { color: white; text-decoration: none; margin: 0 10px; font-weight: bold; }
+        nav a:hover { color: #1abc9c; }
+        .container { max-width: 800px; margin: 30px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #2c3e50; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .btn { background-color: #1abc9c; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn:hover { background-color: #16a085; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 5px; font-weight: bold; }
+        .alert-ok { background-color: #d4edda; color: #155724; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group select, .form-group input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div>
+            <a href="{% url 'home' %}">Domů</a>
+            <a href="{% url 'drinks_list' %}">Nápoje</a>
+            <a href="{% url 'stats' %}">Statistiky</a>
+            <a href="{% url 'add_record' %}">Přidat záznam</a>
+        </div>
+        <div>
+            {% if user.is_authenticated %}
+                <span style="color: white; margin-right: 10px;">Ahoj, {{ user.username }}!</span>
+                <a href="{% url 'logout' %}" style="color: #e74c3c;">Odhlásit se</a>
+            {% else %}
+                <a href="{% url 'register' %}">Registrace</a>
+                <a href="/admin/">Přihlášení</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        {% if section == 'home' %}
+            <h1>Vítej v EnergyTrackeru!</h1>
+            <p>Tento systém ti pomůže sledovat tvoji denní konzumaci energetických nápojů a hlídat bezpečný příjem kofeinu.</p>
+            <p>Pro plnou funkčnost se zaregistruj nebo se přihlas přes administraci.</p>
+        
+        {% elif section == 'drinks' %}
+            <h1>Dostupné energetické nápoje</h1>
+            <p>Tyto nápoje můžeš aktuálně v systému evidovat:</p>
+            <table>
+                <tr>
+                    <th>Název nápoje</th>
+                    <th>Kofein (mg)</th>
+                    <th>Cukr (g)</th>
+                    <th>Objem (ml)</th>
+                </tr>
+                {% for drink in drinks %}
+                <tr>
+                    <td>{{ drink.name }}</td>
+                    <td>{{ drink.caffeine_mg }} mg</td>
+                    <td>{{ drink.sugar_g }} g</td>
+                    <td>{{ drink.volume_ml }} ml</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">V databázi zatím nejsou žádné nápoje. Přidej je v administraci.</td>
+                </tr>
+                {% endfor %}
+            </table>
+
+        {% elif section == 'stats' %}
+            <h1>Tvoje dnešní statistiky</h1>
+            
+            {% if status == 'OK' %}
+                <div class="alert alert-ok">Tvoje dnešní spotřeba kofeinu je v normě: {{ total }} mg (Limit je 400 mg).</div>
+            {% else %}
+                <div class="alert alert-danger">⚠️ POZOR! Překročil jsi bezpečný denní limit kofeinu! Dnes máš v sobě už {{ total }} mg.</div>
+            {% endif %}
+
+            <h3>Dnešní záznamy konzumace:</h3>
+            <table>
+                <tr>
+                    <th>Nápoj</th>
+                    <th>Počet kusů</th>
+                    <th>Kofein celkem</th>
+                </tr>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.drink.name }}</td>
+                    <td>{{ record.amount }}x</td>
+                    <td>{% widthratio record.drink.caffeine_mg 1 record.amount %} mg</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">Dnes jsi ještě nezapsal žádný energetický nápoj.</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <br>
+            <a href="{% url 'add_record' %}" class="btn">Přidat nový nápoj</a>
+
+        {% elif section == 'add' %}
+            <h1>Zapsat konzumaci</h1>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="drink">Vyber nápoj:</label>
+                    <select name="drink" id="drink">
+                        {% for drink in drinks %}
+                            <option value="{{ drink.id }}">{{ drink.name }} ({{ drink.caffeine_mg }} mg kofeinu)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Počet kusů (plechovek):</label>
+                    <input type="number" name="amount" id="amount" value="1" min="1">
+                </div>
+                <button type="submit" class="btn">Uložit záznam</button>
+            </form>
+
+        {% elif section == 'register' %}
+            <h1>Registrace nového uživatele</h1>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn">Zaregistrovat se</button>
+            </form>
+        {% endif %}
+
+    </div>
+
+</body>
+</html>
