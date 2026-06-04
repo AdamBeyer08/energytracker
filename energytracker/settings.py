@@ -4,7 +4,10 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-energy-tracker-key'
 DEBUG = True
-ALLOWED_HOSTS = ['AdamBeyer08.pythonanywhere.com']
+ALLOWED_HOSTS = [
+    'adambeyer08.pythonanywhere.com',
+    '.pythonanywhere.com'
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
