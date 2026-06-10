@@ -3,41 +3,10 @@
 {% block content %}
 <h1>Statistiky</h1>
 
-<h3>Dnes</h3>
-
 {% if status == "OK" %}
-    <div class="alert alert-ok">
-        V normě: {{ total }} mg
-    </div>
+    <p style="color:green;">OK: {{ total }} mg</p>
 {% else %}
-    <div class="alert alert-danger">
-        Překročeno: {{ total }} mg
-    </div>
+    <p style="color:red;">Překročeno: {{ total }} mg</p>
 {% endif %}
 
-<hr>
-
-<h3>Historie</h3>
-
-<table>
-    <tr>
-        <th>Datum</th>
-        <th>Nápoj</th>
-        <th>Počet</th>
-        <th>Kofein</th>
-    </tr>
-
-    {% for record in records %}
-    <tr>
-        <td>{{ record.date }}</td>
-        <td>{{ record.drink.name }}</td>
-        <td>{{ record.amount }}</td>
-        <td>{{ record.drink.caffeine_mg|floatformat:0 }} mg</td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="4">Žádná historie</td>
-    </tr>
-    {% endfor %}
-</table>
 {% endblock %}
