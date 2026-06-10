@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Nápoje</h1>
+
+<table>
+    <tr>
+        <th>Název</th>
+        <th>Kofein</th>
+        <th>Cukr</th>
+        <th>Objem</th>
+    </tr>
+
+    {% for drink in drinks %}
+    <tr>
+        <td>{{ drink.name }}</td>
+        <td>{{ drink.caffeine_mg }} mg</td>
+        <td>{{ drink.sugar_g }} g</td>
+        <td>{{ drink.volume_ml }} ml</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
