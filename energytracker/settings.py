@@ -6,7 +6,9 @@ SECRET_KEY = 'django-insecure-energy-tracker-key'
 DEBUG = True
 ALLOWED_HOSTS = [
     'adambeyer08.pythonanywhere.com',
-    '.pythonanywhere.com'
+    '.pythonanywhere.com',
+    '127.0.0.1',
+    'localhost'
 ]
 
 INSTALLED_APPS = [
