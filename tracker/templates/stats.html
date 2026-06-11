@@ -4,9 +4,37 @@
 <h1>Statistiky</h1>
 
 {% if status == "OK" %}
-    <p style="color:green;">OK: {{ total }} mg</p>
+    <p style="color:green;">
+        Dnešní příjem kofeinu: {{ total }} mg
+    </p>
 {% else %}
-    <p style="color:red;">Překročeno: {{ total }} mg</p>
+    <p style="color:red;">
+        Překročen limit! Dnešní příjem: {{ total }} mg
+    </p>
 {% endif %}
+
+<h2>Historie záznamů</h2>
+
+<table>
+    <tr>
+        <th>Datum</th>
+        <th>Nápoj</th>
+        <th>Počet</th>
+        <th>Kofein</th>
+    </tr>
+
+    {% for record in records %}
+    <tr>
+        <td>{{ record.date }}</td>
+        <td>{{ record.drink.name }}</td>
+        <td>{{ record.amount }}x</td>
+        <td>{% widthratio record.drink.caffeine_mg 1 record.amount %} mg</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4">Zatím nemáš žádné záznamy.</td>
+    </tr>
+    {% endfor %}
+</table>
 
 {% endblock %}
